@@ -8,7 +8,7 @@ import { useCart } from "@/components/CartContext";
 
 type OrderView = {
   order_number: number;
-  status: "pending" | "paid" | "shipped" | "cancelled" | "failed";
+  status: "pending" | "paid" | "ordered" | "shipped" | "cancelled" | "failed";
   customer_name: string;
   subtotal_cents: number;
   shipping_cents: number;
@@ -56,7 +56,7 @@ export default function OrderPage({ params }: { params: Promise<{ token: string 
   }, [token]);
 
   useEffect(() => {
-    if (ready && order && (order.status === "paid" || order.status === "shipped")) clear();
+    if (ready && order && (order.status === "paid" || order.status === "ordered" || order.status === "shipped")) clear();
   }, [ready, order, clear]);
 
   if (notFound) {
@@ -78,6 +78,8 @@ export default function OrderPage({ params }: { params: Promise<{ token: string 
   const heading =
     order.status === "paid"
       ? "Thank you – your payment was received"
+      : order.status === "ordered"
+        ? "Your order is being prepared"
       : order.status === "shipped"
         ? "Your order is on its way"
         : order.status === "pending"
@@ -94,7 +96,7 @@ export default function OrderPage({ params }: { params: Promise<{ token: string 
         <div className="main-col panel">
           <div style={{ marginBottom: 16 }}>
             <span className={`status-pill status-${order.status}`}>
-              {order.status === "pending" ? "Awaiting payment confirmation" : order.status === "paid" ? "Paid" : order.status === "shipped" ? "Shipped" : order.status === "failed" ? "Payment failed" : "Cancelled"}
+              {order.status === "pending" ? "Awaiting payment confirmation" : order.status === "paid" ? "Paid" : order.status === "ordered" ? "Being prepared" : order.status === "shipped" ? "Shipped" : order.status === "failed" ? "Payment failed" : "Cancelled"}
             </span>
           </div>
           {order.status === "pending" && !waitedOut && (
@@ -109,6 +111,9 @@ export default function OrderPage({ params }: { params: Promise<{ token: string 
           )}
           {order.status === "paid" && (
             <p className="muted">We&apos;re packing your order now. You&apos;ll get a tracking number as soon as it ships with The Courier Guy.</p>
+          )}
+          {order.status === "ordered" && (
+            <p className="muted">Your order is being prepared for dispatch. You&apos;ll get a tracking number as soon as it ships with The Courier Guy.</p>
           )}
           {order.status === "shipped" && (
             <p className="muted">

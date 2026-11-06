@@ -15,6 +15,15 @@ Next.js (App Router) + Supabase, payments by PayFast, delivery by The Courier Gu
 | Admin: orders, products with photos, delivery fee | `app/admin`, `components/admin` |
 | PayFast checkout signing and payment confirmation (ITN) | `supabase/functions` |
 
+## Suppliers (reseller setup)
+
+SwiftyMart resells products from suppliers who deliver straight to the customer.
+
+- **Suppliers tab:** supplier details and usual dispatch time. Customers only ever see "Usually dispatched within X–Y working days", never the supplier.
+- **Products:** each product can be linked to a supplier, with the supplier's product code and the cost price. Admin shows the profit per item. Supplier links and cost prices live in `product_supplier`, which only admins can read.
+- **To order tab:** paid orders waiting to be ordered, with a pre-filled email to the supplier (items, codes, and the customer's delivery address). Then "Mark as ordered".
+- **Order steps:** Paid → Ordered from supplier → Shipped (with the tracking number from the supplier). Each order line keeps the cost at the time of sale, so profit per order stays accurate.
+
 ## How payment works
 
 1. Checkout calls the database function `create_order`. Prices and stock come from the database, never the browser.

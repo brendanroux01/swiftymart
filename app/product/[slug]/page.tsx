@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCategory, getProduct } from "@/lib/data";
-import { rand } from "@/lib/format";
+import { getCategory, getDispatch, getProduct } from "@/lib/data";
+import { dispatchText, rand } from "@/lib/format";
 import ProductImage from "@/components/ProductImage";
 import ProductBuyBox from "@/components/ProductBuyBox";
-import { CardIcon, ShieldIcon, TruckIcon } from "@/components/Icons";
+import { CardIcon, ClockIcon, ShieldIcon, TruckIcon } from "@/components/Icons";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +18,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const product = await getProduct(slug);
   if (!product) notFound();
-  const category = await getCategory(product.category_slug);
+  const [category, dispatch] = await Promise.all([getCategory(product.category_slug), getDispatch(product.id)]);
 
   return (
     <div className="container page">
@@ -51,6 +51,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <li>
               <TruckIcon size={20} /> Tracked delivery with The Courier Guy
             </li>
+            {dispatch && (
+              <li>
+                <ClockIcon size={20} /> {dispatchText(dispatch.min_days, dispatch.max_days)}
+              </li>
+            )}
           </ul>
         </div>
       </div>

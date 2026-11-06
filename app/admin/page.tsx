@@ -7,8 +7,18 @@ import AdminLogin from "@/components/admin/AdminLogin";
 import OrdersTab from "@/components/admin/OrdersTab";
 import ProductsTab from "@/components/admin/ProductsTab";
 import SettingsTab from "@/components/admin/SettingsTab";
+import SuppliersTab from "@/components/admin/SuppliersTab";
+import ToOrderTab from "@/components/admin/ToOrderTab";
 
-type Tab = "orders" | "products" | "settings";
+type Tab = "orders" | "toorder" | "products" | "suppliers" | "settings";
+
+const TABS: { key: Tab; label: string }[] = [
+  { key: "orders", label: "Orders" },
+  { key: "toorder", label: "To order" },
+  { key: "products", label: "Products" },
+  { key: "suppliers", label: "Suppliers" },
+  { key: "settings", label: "Settings" },
+];
 
 export default function AdminPage() {
   const supabase = getBrowserClient();
@@ -83,14 +93,16 @@ export default function AdminPage() {
         </div>
       </div>
       <div className="admin-tabs" role="tablist" aria-label="Admin sections">
-        {(["orders", "products", "settings"] as Tab[]).map((t) => (
-          <button key={t} type="button" role="tab" aria-selected={tab === t} onClick={() => setTab(t)}>
-            {t === "orders" ? "Orders" : t === "products" ? "Products" : "Settings"}
+        {TABS.map((t) => (
+          <button key={t.key} type="button" role="tab" aria-selected={tab === t.key} onClick={() => setTab(t.key)}>
+            {t.label}
           </button>
         ))}
       </div>
       {tab === "orders" && <OrdersTab />}
+      {tab === "toorder" && <ToOrderTab />}
       {tab === "products" && <ProductsTab />}
+      {tab === "suppliers" && <SuppliersTab />}
       {tab === "settings" && <SettingsTab />}
     </div>
   );

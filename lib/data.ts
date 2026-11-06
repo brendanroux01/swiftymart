@@ -56,3 +56,8 @@ export async function searchProducts(q: string): Promise<Product[]> {
     .limit(48);
   return (data ?? []) as Product[];
 }
+
+export async function getDispatch(productId: string): Promise<{ min_days: number; max_days: number } | null> {
+  const { data } = await getServerClient().rpc("product_dispatch", { p_product_id: productId });
+  return (data as { min_days: number; max_days: number } | null) ?? null;
+}

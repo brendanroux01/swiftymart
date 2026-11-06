@@ -211,6 +211,7 @@ textarea.input { height: auto; min-height: 96px; padding: 12px 14px; resize: ver
 .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 700; border: 1px solid; white-space: nowrap; }
 .status-pending { color: var(--warning); border-color: #78530a; background: #2a1f05; }
 .status-paid { color: var(--success); border-color: #166534; background: #0b2a19; }
+.status-ordered { color: #c4b5fd; border-color: #5b21b6; background: #1e1433; }
 .status-shipped { color: var(--accent-2); border-color: #0e4f6e; background: #0b2233; }
 .status-failed, .status-cancelled { color: var(--danger); border-color: #7f1d1d; background: #2a0f12; }
 
@@ -283,3 +284,17 @@ table.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; min
   .newsletter { padding: 24px; }
   .cart-line-total { min-width: 0; text-align: left; }
 }
+
+/* Supplier admin */
+.order-card { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.order-card + .order-card { margin-top: 16px; }
+.order-card-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: baseline; }
+.order-card-head h3 { margin: 0; font-size: 18px; }
+.supplier-group { border: 1px solid var(--border); border-radius: 12px; padding: 16px; background: var(--bg); }
+.supplier-group h4 { margin: 0 0 10px; font-size: 15px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.supplier-group ul { margin: 0 0 12px; padding-left: 18px; color: var(--text); font-size: 14px; }
+.supplier-group li { margin: 4px 0; }
+.warn-text { color: var(--warning); font-size: 14px; }
+.profit-pos { color: var(--success); }
+.profit-neg { color: var(--danger); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }

@@ -2,13 +2,14 @@
 
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { getBrowserClient } from "@/lib/supabase";
-import { rand, shortDate } from "@/lib/format";
+import { itemsProfit, rand, shortDate } from "@/lib/format";
 import type { Order } from "@/lib/types";
 
-type Filter = "all" | "pending" | "paid" | "shipped" | "unpaid";
+type Filter = "all" | "pending" | "paid" | "ordered" | "shipped" | "unpaid";
 
 const FILTERS: { key: Filter; label: string }[] = [
-  { key: "paid", label: "To ship" },
+  { key: "paid", label: "Paid – to order" },
+  { key: "ordered", label: "Ordered – to ship" },
   { key: "shipped", label: "Shipped" },
   { key: "pending", label: "Awaiting payment" },
   { key: "unpaid", label: "Failed / cancelled" },
@@ -17,7 +18,7 @@ const FILTERS: { key: Filter; label: string }[] = [
 
 export function StatusPill({ status }: { status: Order["status"] }) {
   const label =
-    status === "pending" ? "Awaiting payment" : status === "paid" ? "Paid – to ship" : status === "shipped" ? "Shipped" : status === "failed" ? "Payment failed" : "Cancelled";
+    status === "pending" ? "Awaiting payment" : status === "paid" ? "Paid – to order" : status === "ordered" ? "Ordered from supplier" : status === "shipped" ? "Shipped" : status === "failed" ? "Payment failed" : "Cancelled";
   return <span className={`status-pill status-${status}`}>{label}</span>;
 }
 
@@ -80,6 +81,7 @@ export default function OrdersTab() {
                 <th>Customer</th>
                 <th>Items</th>
                 <th>Total</th>
+                <th>Profit</th>
                 <th>Status</th>
                 <th>
                   <span className="sr-only">Details</span>
@@ -101,6 +103,9 @@ export default function OrdersTab() {
                     <td>{o.order_items.reduce((n, i) => n + i.quantity, 0)}</td>
                     <td>{rand(o.total_cents)}</td>
                     <td>
+                      <Profit order={o} />
+                    </td>
+                    <td>
                       <StatusPill status={o.status} />
                     </td>
                     <td>
@@ -111,7 +116,7 @@ export default function OrdersTab() {
                   </tr>
                   {open === o.id && (
                     <tr className="order-detail">
-                      <td colSpan={7}>
+                      <td colSpan={8}>
                         <OrderDetail order={o} onChanged={load} />
                       </td>
                     </tr>
@@ -124,6 +129,12 @@ export default function OrdersTab() {
       )}
     </section>
   );
+}
+
+function Profit({ order }: { order: Order }) {
+  const p = itemsProfit(order.order_items);
+  if (p === null) return <span className="muted" title="Add cost prices to the products to see profit">–</span>;
+  return <span className={p >= 0 ? "profit-pos" : "profit-neg"}>{rand(p)}</span>;
 }
 
 function OrderDetail({ order, onChanged }: { order: Order; onChanged: () => void }) {
@@ -186,18 +197,29 @@ function OrderDetail({ order, onChanged }: { order: Order; onChanged: () => void
             <span>Total</span>
             <span>{rand(order.total_cents)}</span>
           </div>
+          <div className="summary-row" style={{ fontSize: 14 }}>
+            <span>Profit on items (excl. delivery)</span>
+            <Profit order={order} />
+          </div>
         </div>
         <div>
           <h4>Payment</h4>
           <p>
             {order.paid_at ? `Paid ${shortDate(order.paid_at)}` : "Not paid"}
             {order.payfast_payment_id ? `\nPayFast ref: ${order.payfast_payment_id}` : ""}
+            {order.supplier_ordered_at ? `\nOrdered from supplier ${shortDate(order.supplier_ordered_at)}` : ""}
+            {order.supplier_reference ? `\nSupplier ref: ${order.supplier_reference}` : ""}
             {order.shipped_at ? `\nShipped ${shortDate(order.shipped_at)}` : ""}
           </p>
         </div>
       </div>
 
-      {(order.status === "paid" || order.status === "shipped") && (
+      {order.status === "paid" && (
+        <p className="muted" style={{ marginTop: 16 }}>
+          Next step: order it from the supplier on the <strong>To order</strong> tab.
+        </p>
+      )}
+      {(order.status === "ordered" || order.status === "shipped") && (
         <form
           className="inline-form"
           onSubmit={(e) => {
@@ -206,7 +228,7 @@ function OrderDetail({ order, onChanged }: { order: Order; onChanged: () => void
           }}
         >
           <div className="field">
-            <label htmlFor={`tracking-${order.id}`}>The Courier Guy tracking number</label>
+            <label htmlFor={`tracking-${order.id}`}>Tracking number from the supplier</label>
             <input id={`tracking-${order.id}`} className="input" value={tracking} maxLength={60} onChange={(e) => setTracking(e.target.value)} />
           </div>
           <button type="submit" className="btn btn-primary" disabled={busy}>

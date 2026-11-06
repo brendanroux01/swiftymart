@@ -81,6 +81,19 @@ export const TrashIcon = ({ size = 18, className }: P) => (
   </svg>
 );
 
+export const ClockIcon = ({ size = 20, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 2" />
+  </svg>
+);
+export const MailIcon = ({ size = 18, className }: P) => (
+  <svg {...base(size)} className={className}>
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="M3 7l9 6 9-6" />
+  </svg>
+);
+
 export function CategoryIcon({ slug, size = 28 }: { slug: string; size?: number }) {
   if (slug === "backup-power") return <BoltIcon size={size} />;
   if (slug === "gaming-gear") return <GamepadIcon size={size} />;
